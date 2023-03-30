@@ -32,7 +32,7 @@
 
 #ifndef _GNUstep_H_NSView
 #define _GNUstep_H_NSView
-#import <GNUstepBase/GSVersionMacros.h>
+#import <AppKit/AppKitDefines.h>
 
 #import <AppKit/NSGraphicsContext.h>
 #import <AppKit/NSResponder.h>
@@ -112,6 +112,7 @@ enum {
   NSViewHeightSizable	= 16,	// view's height can stretch
   NSViewMaxYMargin	= 32 	// top margin between views can stretch
 };
+typedef NSUInteger NSAutoresizingMaskOptions;
 
 /*
  * constants defining if and how a view (or cell) should draw a focus ring
@@ -122,6 +123,7 @@ typedef enum _NSFocusRingType {
   NSFocusRingTypeExterior = 2
 } NSFocusRingType;
 
+APPKIT_EXPORT_CLASS
 @interface NSView : NSResponder
 {
   NSRect _frame;
@@ -177,6 +179,9 @@ PACKAGE_SCOPE
   BOOL _renew_gstate;
   BOOL _is_hidden;
   BOOL _in_live_resize;
+  BOOL _needsLayout;
+  BOOL _needsUpdateConstraints;
+  BOOL _translatesAutoresizingMaskIntoConstraints;
 
   NSUInteger _autoresizingMask;
   NSFocusRingType _focusRingType;
@@ -636,6 +641,36 @@ PACKAGE_SCOPE
 #else
 - (NSUserInterfaceLayoutDirection) userInterfaceLayoutDirection;
 - (void) setUserInterfaceLayoutDirection: (NSUserInterfaceLayoutDirection)dir;
+#endif
+#endif
+
+/**
+* Layout
+*/
+
+#if OS_API_VERSION(MAC_OS_X_VERSION_10_7, GS_API_LATEST)
+- (void) layoutSubtreeIfNeeded;
+- (void) layout;
+
+#if GS_HAS_DECLARED_PROPERTIES
+@property (nonatomic) BOOL needsLayout;
+#else
+-(BOOL) needsLayout;
+-(void) setNeedsLayout: (BOOL)needsLayout;
+#endif
+
+#if GS_HAS_DECLARED_PROPERTIES
+@property (nonatomic) BOOL needsUpdateConstraints;
+#else
+- (BOOL) needsUpdateConstraints;
+- (void) setNeedsUpdateConstraints: (BOOL)needsUpdateConstraints;
+#endif
+
+#if GS_HAS_DECLARED_PROPERTIES
+@property BOOL translatesAutoresizingMaskIntoConstraints;
+#else
+- (BOOL) translatesAutoresizingMaskIntoConstraints;
+- (void) setTranslatesAutoresizingMaskIntoConstraints: (BOOL)translatesAutoresizingMaskIntoConstraints;
 #endif
 #endif
 

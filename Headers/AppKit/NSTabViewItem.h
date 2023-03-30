@@ -28,6 +28,7 @@
 #ifndef _GNUstep_H_NSTabViewItem
 #define _GNUstep_H_NSTabViewItem
 
+#import <AppKit/AppKitDefines.h>
 #import <Foundation/NSGeometry.h>
 #import <Foundation/NSObject.h>
 
@@ -43,6 +44,7 @@ typedef enum {
 @class NSView;
 @class NSViewController;
 
+APPKIT_EXPORT_CLASS
 @interface NSTabViewItem : NSObject <NSCoding>
 {
   id _ident;

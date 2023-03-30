@@ -1,3 +1,44 @@
+2023-02-12 Gregory John Casamento <greg.casamento@gmail.com>
+
+	* Source/NSCollectionView.m: Implementation of methods
+	to support selection by indexPaths and use of NSCollectionViewLayout
+	* Source/NSCollectionViewLayout.m: Implementation of
+	NSCollectionViewLayout class to support custom collection view
+	layouts.
+	* Source/NSCollectionViewGridLayout.m: Implementation of the
+	Grid layout.
+	* Source/NSCollectionViewFlowLayout.m: Implementation of the
+	flow layout.
+	* Source/NSCollectionViewItem.m: Minor changes to support
+	new functionality.
+	* Headers/AppKit/NSCollectionView.h: Add new methods.
+	* Headers/AppKit/NSCollectionViewLayout.h:
+	* Headers/AppKit/NSCollectionViewGridLayout:
+	* Headers/AppKit/NSCollectionViewFlowLayout: Add new classes.
+
+
+2023-01-03 Gregory John Casamento <greg.casamento@gmail.com>
+
+	* Source/NSDrawer.m: Open drawer on the opposite edge if needed when
+	close to the boundary of the screen.
+
+2022-12-29 Richard Frith-Macdonald <rfm@gnu.org>
+
+        * ChangeLog: Update for new release
+	* ANNOUNCE:
+	* NEWS:
+	* Documentation/news.texi: Update of release notes for 0.30.0 by Fred.
+	* Version: bump to 0.30.0
+	-defaultLineHeightForFont: and -defaultBaselineOffsetForFont:.
+
+2022-10-11 Riccardo Mottola <rm@gnu.org>
+
+	* Source/NSTextView.m
+	Fix click on TextAttachmentCells, where the left side was not respected.
+	This was because index was respecting fraction and thus loosing the
+	attachment when clicking on the right part, only for this case,
+	recalculate character index without respectFraction.
+
 2022-09-01 Gregory John Casamento <greg.casamento@gmail.com>
 
 	* Source/NSButtonCell.m: Move method to detect if button is a

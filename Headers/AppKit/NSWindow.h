@@ -35,7 +35,7 @@
 
 #ifndef _GNUstep_H_NSWindow
 #define _GNUstep_H_NSWindow
-#import <GNUstepBase/GSVersionMacros.h>
+#import <AppKit/AppKitDefines.h>
 
 #import <AppKit/NSGraphicsContext.h>
 #import <AppKit/NSResponder.h>
@@ -65,6 +65,7 @@
 @class NSViewController;
 
 @class GSWindowDecorationView;
+@class GSAutoLayoutEngine;
 
 /*
  * Window levels are taken from MacOS-X
@@ -227,6 +228,7 @@ APPKIT_EXPORT NSSize NSTokenSize;
  * -convertBaseToScreen: and -convertScreenToBase: methods.
  * </p>
  */
+APPKIT_EXPORT_CLASS
 @interface NSWindow : NSResponder <NSCoding>
 {
   NSRect        _frame;
@@ -239,6 +241,7 @@ APPKIT_EXPORT NSSize NSTokenSize;
   id            _firstResponder;
   id            _futureFirstResponder;
   NSView        *_initialFirstResponder;
+  GSAutoLayoutEngine *_layoutEngine;
 PACKAGE_SCOPE
   id            _delegate;
 @protected

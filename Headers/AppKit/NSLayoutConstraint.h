@@ -29,8 +29,10 @@
 #import <Foundation/NSGeometry.h>
 #import <Foundation/NSKeyedArchiver.h>
 #import <AppKit/NSLayoutAnchor.h>
+#import <AppKit/NSView.h>
+#import <AppKit/NSWindow.h>
 
-@class NSControl, NSView, NSAnimation, NSArray, NSMutableArray, NSDictionary;
+@class NSControl, NSAnimation, NSArray, NSMutableArray, NSDictionary;
 
 #if OS_API_VERSION(MAC_OS_X_VERSION_10_10, GS_API_LATEST)
 
@@ -103,6 +105,7 @@ enum {
 };
 typedef NSUInteger NSLayoutFormatOptions;
 
+APPKIT_EXPORT_CLASS
 @interface NSLayoutConstraint : NSObject <NSCoding, NSCopying>
 {
   NSLayoutAnchor *_firstAnchor;
@@ -156,7 +159,36 @@ typedef NSUInteger NSLayoutFormatOptions;
 
 - (NSLayoutAnchor *) secondAnchor;
 
-- (NSLayoutPriority) priority;  
+#if GS_HAS_DECLARED_PROPERTIES
+@property NSLayoutPriority priority;
+#else
+- (NSLayoutPriority) priority;
+- (void) setPriority: (NSLayoutPriority)priority;
+#endif
+
+@end
+
+@interface NSView (NSConstraintBasedLayoutCoreMethods)
+
+- (void) updateConstraints;
+
+- (void) updateConstraintsForSubtreeIfNeeded;
+
+@end
+
+@interface NSView (NSConstraintBasedLayoutInstallingConstraints)
+
+- (void) addConstraint: (NSLayoutConstraint *)constraint;
+
+- (void) addConstraints: (NSArray*)constraints;
+
+@end
+
+@interface NSWindow (NSConstraintBasedLayoutCoreMethods)
+
+- (void) _bootstrapAutoLayout;
+
+- (void) layoutIfNeeded;
 
 @end
 

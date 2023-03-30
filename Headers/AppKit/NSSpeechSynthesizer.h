@@ -29,6 +29,7 @@
 #define _GNUstep_H_NSSpeechSynthesizer
 
 #import <Foundation/NSObject.h>
+#import <AppKit/AppKitDefines.h>
 
 // NSSpeechBoundary enumerated type...
 typedef enum 
@@ -100,6 +101,7 @@ extern NSString *NSSpeechDictionaryEntrySpelling;
 extern NSString *NSSpeechDictionaryEntryPhonemes;
 
 // class declaration...
+APPKIT_EXPORT_CLASS
 @interface NSSpeechSynthesizer : NSObject
 
 // init...

@@ -54,6 +54,7 @@ NSAppearance.m \
 NSApplication.m \
 NSArrayController.m \
 NSAttributedString.m \
+NSAutoresizingMaskLayoutConstraint.m \
 NSBezierPath.m \
 NSBitmapImageRep.m \
 NSBitmapImageRep+GIF.m \
@@ -76,6 +77,11 @@ NSClipView.m \
 NSClickGestureRecognizer.m \
 NSCollectionView.m \
 NSCollectionViewItem.m \
+NSCollectionViewLayout.m \
+NSCollectionViewCompositionalLayout.m \
+NSCollectionViewFlowLayout.m \
+NSCollectionViewGridLayout.m \
+NSCollectionViewTransitionLayout.m \
 NSColor.m \
 NSColorList.m \
 NSColorPanel.m \
@@ -97,6 +103,7 @@ NSDataLinkManager.m \
 NSDataLinkPanel.m \
 NSDatePicker.m \
 NSDatePickerCell.m \
+NSDictionaryController.m \
 NSDockTile.m \
 NSDocument.m \
 NSDocumentController.m \
@@ -349,7 +356,9 @@ GSXibLoader.m \
 GSXibLoading.m \
 GSXibKeyedUnarchiver.m \
 GSXib5KeyedUnarchiver.m \
-GSHelpAttachment.m 
+GSHelpAttachment.m \
+GSAutoLayoutEngine.m \
+GSAutoLayoutVFLParser.m
 
 # Turn off NSMenuItem warning that NSMenuItem conforms to <NSObject>,
 # but does not implement <NSObject>'s methods itself (it inherits
@@ -401,6 +410,11 @@ NSClickGestureRecognizer.h \
 NSClipView.h \
 NSCollectionView.h \
 NSCollectionViewItem.h \
+NSCollectionViewLayout.h \
+NSCollectionViewCompositionalLayout.h \
+NSCollectionViewFlowLayout.h \
+NSCollectionViewGridLayout.h \
+NSCollectionViewTransitionLayout.h \
 NSColor.h \
 NSColorList.h \
 NSColorPanel.h \
@@ -422,6 +436,7 @@ NSDataLinkManager.h \
 NSDataLinkPanel.h \
 NSDatePicker.h \
 NSDatePickerCell.h \
+NSDictionaryController.h \
 NSDockTile.h \
 NSDocument.h \
 NSDocumentController.h \
@@ -658,7 +673,9 @@ GSWindowDecorationView.h \
 GSXibElement.h \
 GSXibLoading.h \
 GSXibKeyedUnarchiver.h \
-GSHelpAttachment.h
+GSHelpAttachment.h \
+GSAutoLayoutVFLParser.h \
+GSAutoLayoutEngine.h
 
 libgnustep-gui_HEADER_FILES = ${GUI_HEADERS}
 

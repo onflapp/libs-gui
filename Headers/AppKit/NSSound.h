@@ -30,6 +30,7 @@
 
 #ifndef _GNUstep_H_NSSound
 #define _GNUstep_H_NSSound
+#import <AppKit/AppKitDefines.h>
 
 #import <Foundation/NSObject.h>
 #import <Foundation/NSBundle.h>
@@ -54,6 +55,7 @@
  */
 NSArray *PlaybackDeviceIdentifiers (void);
 
+APPKIT_EXPORT_CLASS
 @interface NSSound : NSObject <NSCoding, NSCopying>
 {		
   NSString *_name;

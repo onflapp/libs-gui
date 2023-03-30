@@ -29,7 +29,7 @@
 
 #ifndef _GNUstep_H_AppKit
 #define _GNUstep_H_AppKit
-#import <GNUstepBase/GSVersionMacros.h>
+#import <AppKit/AppKitDefines.h>
 
 /* Define library version */
 #import <GNUstepGUI/GSVersion.h>
@@ -67,7 +67,10 @@
 #import <AppKit/NSCIImageRep.h>
 #import <AppKit/NSClipView.h>
 #import <AppKit/NSCollectionView.h>
+#import <AppKit/NSCollectionViewFlowLayout.h>
+#import <AppKit/NSCollectionViewGridLayout.h>
 #import <AppKit/NSCollectionViewItem.h>
+#import <AppKit/NSCollectionViewLayout.h>
 #import <AppKit/NSColor.h>
 #import <AppKit/NSColorList.h>
 #import <AppKit/NSColorPanel.h>
@@ -164,6 +167,7 @@
 #import <AppKit/NSDockTile.h>
 #import <AppKit/NSDocument.h>
 #import <AppKit/NSDocumentController.h>
+#import <AppKit/NSDictionaryController.h>
 #import <AppKit/NSDrawer.h>
 #import <AppKit/NSFileWrapperExtensions.h>
 #import <AppKit/NSFontAssetRequest.h>

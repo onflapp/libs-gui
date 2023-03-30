@@ -62,6 +62,7 @@
 #import "AppKit/NSFont.h"
 #import "AppKit/NSGraphics.h"
 #import "AppKit/NSKeyValueBinding.h"
+#import "AppKit/NSLayoutConstraint.h"
 #import "AppKit/NSMenu.h"
 #import "AppKit/NSPasteboard.h"
 #import "AppKit/NSPrintInfo.h"
@@ -76,8 +77,11 @@
 #import "GNUstepGUI/GSNibLoading.h"
 #import "GSToolTips.h"
 #import "GSBindingHelpers.h"
+#import "GSFastEnumeration.h"
 #import "GSGuiPrivate.h"
+#import "GSAutoLayoutEngine.h"
 #import "NSViewPrivate.h"
+#import "NSWindowPrivate.h"
 
 /*
  * We need a fast array that can store objects without retain/release ...
@@ -630,7 +634,10 @@ GSSetDragTypes(NSView* obj, NSArray *types)
   //_previousKeyView = 0;
 
   _alphaValue = 1.0;
-  
+
+  _needsUpdateConstraints = YES;
+  _translatesAutoresizingMaskIntoConstraints = YES;
+
   return self;
 }
 
@@ -5127,6 +5134,105 @@ static NSView* findByTag(NSView *view, NSInteger aTag, NSUInteger *level)
 {
   // FIXME: implement this
   return;
+}
+
+/**
+* Layout 
+*/
+
+- (void) layout
+{
+  GSAutoLayoutEngine *engine = [self _layoutEngine];
+  if (!engine)
+    {
+      return;
+    }
+
+  NSArray *subviews = [self subviews];
+  FOR_IN (NSView *, subview, subviews)
+    NSRect subviewAlignmentRect =
+        [engine alignmentRectForView: subview];
+    [subview setFrame: subviewAlignmentRect];
+  END_FOR_IN (subviews);
+}
+
+- (void) layoutSubtreeIfNeeded
+{
+  [self updateConstraintsForSubtreeIfNeeded];
+  [self _layoutViewAndSubViews];
+}
+
+- (void) setNeedsLayout: (BOOL) needsLayout
+{
+  if (!needsLayout)
+    {
+      return;
+    }
+  _needsLayout = needsLayout;
+}
+
+- (BOOL) needsLayout
+{
+  return _needsLayout;
+}
+
+- (void) setNeedsUpdateConstraints: (BOOL)needsUpdateConstraints
+{
+  // Calling setNeedsUpdateConstraints with NO should not have an effect
+  if (!needsUpdateConstraints)
+    {
+      return;
+    }
+
+  _needsUpdateConstraints = YES;
+}
+
+- (BOOL) needsUpdateConstraints
+{
+  return _needsUpdateConstraints;
+}
+
+- (void) setTranslatesAutoresizingMaskIntoConstraints: (BOOL)translate
+{
+  _translatesAutoresizingMaskIntoConstraints = translate;
+}
+
+- (BOOL) translatesAutoresizingMaskIntoConstraints
+{
+  return _translatesAutoresizingMaskIntoConstraints;
+}
+
+@end
+
+@implementation NSView (NSConstraintBasedLayoutCorePrivateMethods)
+// This private setter allows the updateConstraints method to toggle needsUpdateConstraints
+- (void) _setNeedsUpdateConstraints: (BOOL)needsUpdateConstraints
+{
+  _needsUpdateConstraints = needsUpdateConstraints;
+}
+
+- (void) _layoutViewAndSubViews
+{
+  if (_needsLayout)
+    {
+      [self layout];
+      _needsLayout = NO;
+    }
+
+  NSArray *subviews = [self subviews];
+  FOR_IN (NSView *, subview, subviews)
+    [subview _layoutViewAndSubViews];
+  END_FOR_IN (subviews);
+}
+
+- (GSAutoLayoutEngine*) _layoutEngine
+{
+  if (![self window])
+    {
+      return nil;
+    }
+
+  return [[self window] _layoutEngine];
 }
 
 @end

@@ -30,11 +30,10 @@
 
 #ifndef _GNUstep_H_NSFont
 #define _GNUstep_H_NSFont
-#import <GNUstepBase/GSVersionMacros.h>
+#import <AppKit/AppKitDefines.h>
 
 #import <Foundation/NSObject.h>
 #import <Foundation/NSGeometry.h>
-#import <AppKit/AppKitDefines.h>
 // For NSControlSize
 #import <AppKit/NSColor.h>
 
@@ -75,8 +74,9 @@ typedef enum _NSFontRenderingMode
 } NSFontRenderingMode;
 #endif
 
-APPKIT_EXPORT const CGFloat *NSFontIdentityMatrix;
+APPKIT_EXPORT const CGFloat NSFontIdentityMatrix[6];
 
+APPKIT_EXPORT_CLASS
 @interface NSFont : NSObject <NSCoding, NSCopying>
 {
   NSString *fontName;
