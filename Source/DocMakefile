@@ -324,9 +324,14 @@ Gui_AGSDOC_FLAGS = \
 	-TypedefsTemplate TypesAndConstants \
 	-VariablesTemplate TypesAndConstants \
 	-WordMap '{\
-	APPKIT_EXTERN="";APPKIT_EXPORT_CLASS=""; \
-	APPKIT_EXPORT=extern;APPKIT_DECLARE="";\
-	DEFINE_RINT_IF_MISSING=""; \
+	APPKIT_EXPORT_CLASS="";\
+	APPKIT_EXPORT=extern;\
+	APPKIT_DECLARE="";\
+	APPKIT_EXTERN=extern;\
+	DEFINE_RINT_IF_MISSING="";\
+	PACKAGE_SCOPE="";\
+	IBOutlet="";\
+	IBAction=void;\
 	}' -Up Gui
 
 GuiAdditions_AGSDOC_FLAGS = \
@@ -341,7 +346,7 @@ GuiAdditions_AGSDOC_FLAGS = \
 	-TypedefsTemplate TypesAndConstants \
 	-VariablesTemplate TypesAndConstants \
 	-WordMap '{\
-	APPKIT_EXTERN="";APPKIT_EXPORT_CLASS=""; \
+	APPKIT_EXPORT_CLASS="";\
 	APPKIT_EXPORT=extern;APPKIT_DECLARE="";\
 	DEFINE_RINT_IF_MISSING=""; \
 	}' -Up GuiAdditions
