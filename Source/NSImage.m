@@ -418,6 +418,7 @@ repd_for_rep(NSArray *_reps, NSImageRep *rep)
 @interface NSImage (Private)
 + (void) _clearFileTypeCaches: (NSNotification*)notif;
 + (void) _reloadCachedImages;
+- (void) _clearRepCaches: (NSNotification*)notif;
 - (BOOL) _useFromFile: (NSString *)fileName;
 - (BOOL) _loadFromData: (NSData *)data;
 - (BOOL) _loadFromFile: (NSString *)fileName;
@@ -456,6 +457,7 @@ repd_for_rep(NSArray *_reps, NSImageRep *rep)
 	   selector: @selector(_clearFileTypeCaches:)
 	       name: NSImageRepRegistryChangedNotification
 	     object: [NSImageRep class]];
+
       [imageLock unlock];
     }
 }
@@ -534,6 +536,12 @@ repd_for_rep(NSArray *_reps, NSImageRep *rep)
   _reps = [[NSMutableArray alloc] initWithCapacity: 2];
   ASSIGN(_color, clearColor);
   _cacheMode = NSImageCacheDefault;
+
+  [[NSNotificationCenter defaultCenter]
+    addObserver:self
+       selector:@selector(_clearRepCaches:)
+           name:NSApplicationDidChangeScreenParametersNotification
+         object:nil];
 
   return self;
 }
@@ -670,6 +678,7 @@ repd_for_rep(NSArray *_reps, NSImageRep *rep)
 
 - (void) dealloc
 {
+  [[NSNotificationCenter defaultCenter] removeObserver: self];
   if (_name == nil)
     {
       RELEASE(_reps);
@@ -2280,6 +2289,11 @@ iterate_reps_for_types(NSArray* imageReps, SEL method)
   return name;
 }
 
+- (void) _clearRepCaches: (NSNotification*)notif
+{
+  NSDebugLLog(@"NSImage", @"Screen size has changed");
+  [self recache];
+}
 - (BOOL) _loadFromData: (NSData *)data
 {
   BOOL ok;
