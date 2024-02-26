@@ -447,11 +447,21 @@ static GSTextFinder *sharedTextFinder;
 
 - (BOOL) _loadPanel
 {
+  BOOL found = NO;
   NSDictionary *table =
     [NSDictionary dictionaryWithObject: self forKey: NSNibOwner];
-  if (![GSGuiBundle() loadNibFile: @"GSFindPanel"
-		externalNameTable: table
-			 withZone: [self zone]])
+
+  //try to load panel from the local bundle first
+  found = [[NSBundle mainBundle] loadNibFile: @"GSFindPanel"
+                           externalNameTable: table
+			            withZone: [self zone]];
+
+  if (!found)
+    found = [GSGuiBundle() loadNibFile: @"GSFindPanel"
+		     externalNameTable: table
+	                      withZone: [self zone]];
+
+  if (!found)
     {
       NSLog(@"Model file load failed for GSFindPanel");
       return NO;
