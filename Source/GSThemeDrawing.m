@@ -33,6 +33,7 @@
 
 #import "AppKit/NSAttributedString.h"
 #import "AppKit/NSBezierPath.h"
+#import "AppKit/NSButton.h"
 #import "AppKit/NSButtonCell.h"
 #import "AppKit/NSBrowser.h"
 #import "AppKit/NSBrowserCell.h"
@@ -967,12 +968,11 @@
   // fill oval with background color
   [backgroundColor set];
   [oval fill];
-  
+
   // and stroke rounded button
   [[NSColor shadowColor] set];
   [oval stroke];
 }
-
 
 - (void) drawSwitchInRect: (NSRect)rect
                  forState: (NSControlStateValue)state
@@ -2071,6 +2071,38 @@ static NSDictionary *titleTextAttributes[3] = {nil, nil, nil};
 	  PSstroke();
 	}
     }
+}
+
+- (void) setFrameForCloseButton: (NSButton *)closeButton
+		       viewSize: (NSSize)viewSize
+{
+  NSSize buttonSize = [[closeButton image] size];
+  buttonSize = NSMakeSize(buttonSize.width + 3, buttonSize.height + 3);
+  
+  [closeButton setFrame: NSMakeRect(viewSize.width - buttonSize.width - 4,
+                   		   (viewSize.height - buttonSize.height) / 2,
+  		                    buttonSize.width, 
+				    buttonSize.height)];
+}
+
+- (NSRect) closeButtonFrameForBounds: (NSRect)bounds
+{
+  GSTheme *theme = [GSTheme theme];
+
+  return NSMakeRect(bounds.size.width - [theme titlebarButtonSize] - 
+				   [theme titlebarPaddingRight], bounds.size.height - 
+				   [theme titlebarButtonSize] - [theme titlebarPaddingTop], 
+				   [theme titlebarButtonSize], [theme titlebarButtonSize]);
+}
+
+- (NSRect) miniaturizeButtonFrameForBounds: (NSRect)bounds
+{
+  GSTheme *theme = [GSTheme theme];
+
+  return NSMakeRect([theme titlebarPaddingLeft], 
+		    bounds.size.height - [theme titlebarButtonSize] - [theme titlebarPaddingTop], 
+		    [theme titlebarButtonSize],
+		    [theme titlebarButtonSize]);
 }
 
 - (NSColor *) browserHeaderTextColor
@@ -3278,18 +3310,10 @@ static NSDictionary *titleTextAttributes[3] = {nil, nil, nil};
 
     if (selectionColor == nil)
       {
-	// Switch to the alternate color of the backgroundColor is white.
-	if([backgroundColor isEqual: [NSColor whiteColor]])
-	  {
-	    selectionColor = [NSColor colorWithCalibratedRed: 0.86
-						       green: 0.92
-							blue: 0.99
-						       alpha: 1.0];
-	  }
-	else
-	  {
-	    selectionColor = [NSColor whiteColor];
-	  }
+	selectionColor = [NSColor colorWithCalibratedRed: 0.86
+						   green: 0.92
+						    blue: 0.99
+						   alpha: 1.0];
       }
     [selectionColor set];
   }
@@ -3448,6 +3472,18 @@ static NSDictionary *titleTextAttributes[3] = {nil, nil, nil};
 
       if (i == editedColumn && rowIndex == editedRow)
 	[cell _setInEditing: NO];
+    }
+}
+
+- (BOOL) isBoxOpaque: (NSBox *)box
+{
+  if ([box boxType] == NSBoxCustom)
+    {
+      return ![box isTransparent];
+    }
+  else
+    {
+      return YES;
     }
 }
 

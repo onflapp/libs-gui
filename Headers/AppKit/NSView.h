@@ -34,6 +34,7 @@
 #define _GNUstep_H_NSView
 #import <AppKit/AppKitDefines.h>
 
+#import <AppKit/NSAppearance.h>
 #import <AppKit/NSGraphicsContext.h>
 #import <AppKit/NSResponder.h>
 #import <AppKit/NSUserInterfaceLayout.h>
@@ -54,6 +55,7 @@
 @class NSScrollView;
 @class NSView;
 @class NSWindow;
+@class NSShadow;
 
 typedef NSInteger NSTrackingRectTag;
 typedef NSInteger NSToolTipTag;
@@ -128,7 +130,7 @@ extern const CGFloat NSViewNoInstrinsicMetric;
 extern const CGFloat NSViewNoIntrinsicMetric;
 
 APPKIT_EXPORT_CLASS
-@interface NSView : NSResponder
+@interface NSView : NSResponder <NSAppearanceCustomization>
 {
   NSRect _frame;
   NSRect _bounds;
@@ -193,6 +195,8 @@ PACKAGE_SCOPE
   NSUInteger _autoresizingMask;
   NSFocusRingType _focusRingType;
   NSRect _autoresizingFrameError;
+  NSShadow *_shadow;
+  NSAppearance* _appearance;
 }
 
 /*
@@ -684,7 +688,7 @@ PACKAGE_SCOPE
 @property float contentCompressionResistancePriority;
 #else
 - (BOOL) contentCompressionResistancePriority;
-- (void) setContentCompressionResistancePriority: (float)priority;
+- (void) setContentCompressionResistancePriority: (NSLayoutPriority)priority;
 #endif
 
 #if GS_HAS_DECLARED_PROPERTIES
@@ -731,6 +735,20 @@ PACKAGE_SCOPE
 - (void) addConstraint: (NSLayoutConstraint *)constraint;
 
 - (void) addConstraints: (NSArray*)constraints;
+
+@end
+#endif
+
+#if OS_API_VERSION(MAC_OS_X_VERSION_10_5, GS_API_LATEST)
+/*
+ * Core Animation support methods.  More methods will be added here as more are implemented.
+ */
+
+@interface NSView (CoreAnimationSupport)
+
+- (NSShadow *) shadow;
+
+- (void) setShadow: (NSShadow *)shadow;
 
 @end
 #endif

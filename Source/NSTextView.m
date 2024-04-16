@@ -1142,6 +1142,7 @@ that makes decoding and encoding compatible with the old code.
       [notificationCenter removeObserver: _delegate
                           name: nil
                           object: _notifObject];
+      _delegate = nil;
     }
 
   DESTROY(_selectedTextAttributes);
@@ -4987,9 +4988,10 @@ right.)
           NSArray *list = [pboard propertyListForType: NSFilenamesPboardType];
           NSMutableAttributedString *as = [[NSMutableAttributedString alloc] init]; 
 
-	  for (NSString *filename in list)
+	  id<NSFastEnumeration> enumerator = list;
+	  FOR_IN (NSString*, filename, enumerator)
 	   {
-	      NSFileWrapper *fw = [[NSFileWrapper alloc] initWithPath:filename];
+	      NSFileWrapper *fw = [[NSFileWrapper alloc] initWithPath: filename];
 	      if (fw) 
 	        {
 	          NSTextAttachment *attachment = [[NSTextAttachment alloc] 
@@ -5000,22 +5002,25 @@ right.)
 	          RELEASE(fw);
 	          RELEASE(attachment);
 
-	          [as appendAttributedString:asat];
+	          [as appendAttributedString: asat];
 	        }
 	   }
+	  END_FOR_IN(enumerator)
 
-	  if (as && changeRange.location != NSNotFound &&
+          if ([as length] != 0  && changeRange.location != NSNotFound &&
 	      [self shouldChangeTextInRange: changeRange
 		replacementString: [as string]])
-	    {
+            {
 	      [self replaceCharactersInRange: changeRange
 		withAttributedString: as];
 	      [self didChangeText];
 	      changeRange.length = [as length];
 	      [self setSelectedRange: NSMakeRange(NSMaxRange(changeRange),0)];
 	    }
-	  return YES;
-	}
+
+	RELEASE(as);
+	return YES;
+      }
     }
 
   // color accepting

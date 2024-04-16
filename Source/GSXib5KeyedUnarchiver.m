@@ -287,6 +287,8 @@ static NSArray      *XmlBoolDefaultYes  = nil;
                                            @"initialItem", @"NSSelectedTabViewItem",
                                            @"allowsExpansionToolTips", @"NSControlAllowsExpansionToolTips",
                                            @"segments", @"NSSegmentImages",
+                                           @"label", @"NSSegmentItemLabel",
+                                           @"image", @"NSSegmentItemImage",
                                            @"editable", @"NSIsEditable",
                                            @"objectValues", @"NSPopUpListData",
                                            @"maxNumberOfRows", @"NSMaxNumberOfGridRows",
@@ -324,7 +326,10 @@ static NSArray      *XmlBoolDefaultYes  = nil;
                                            @"beginningViews", @"NSStackViewBeginningContainer",  // NSStackView
                                            @"middleViews", @"NSStackViewMiddleContainer",
                                            @"endViews", @"NSStackViewEndContainer",
-					   @"collectionViewLayout", @"NSCollectionViewLayout",
+                                           @"collectionViewLayout", @"NSCollectionViewLayout",
+                                           @"shadow", @"NSViewShadow",
+                                           @"blurRadius", @"NSShadowBlurRadius",
+                                           @"color", @"NSShadowColor",
                                            nil];
           RETAIN(XmlKeyMapTable);
 
@@ -445,6 +450,8 @@ static NSArray      *XmlBoolDefaultYes  = nil;
                @"decodeSecondAttribute:", @"NSSecondAttribute",
                @"decodeRelation:", @"NSRelation",
                @"decodeTransitionStyle:", @"NSTransitionStyle",
+	       @"decodeShadowOffsetHoriz:", @"NSShadowHoriz",
+	       @"decodeShadowOffsetVert:", @"NSShadowVert",
                  nil];
           RETAIN(XmlKeyToDecoderSelectorMap);
 
@@ -870,10 +877,12 @@ didStartElement: (NSString*)elementName
               // Need to store element for making the connections...
               [self addConnection: element];
             }
+          /*
           else if ([XmlConstraintRecordTags containsObject: elementName])
             {
               [self objectForXib: element]; // decode the constraint...
             }
+          */
         }
       else
         {
@@ -2386,8 +2395,7 @@ didStartElement: (NSString*)elementName
       mask.flags.highlighted              = [[attributes objectForKey: @"highlighted"] boolValue];
       mask.flags.disabled                 = ([attributes objectForKey: @"enabled"] ?
                                              [[attributes objectForKey: @"enabled"] boolValue] == NO : NO);
-      mask.flags.editable                 = ([attributes objectForKey: @"editable"] ?
-                                             [[attributes objectForKey: @"editable"] boolValue] : YES);
+      mask.flags.editable                 = [[attributes objectForKey: @"editable"] boolValue];
       mask.flags.vCentered                = [[attributes objectForKey: @"alignment"] isEqualToString: @"center"];
       mask.flags.hCentered                = [[attributes objectForKey: @"alignment"] isEqualToString: @"center"];
       mask.flags.bordered                 = [[borderStyle lowercaseString] containsString: @"border"];
@@ -2982,6 +2990,18 @@ didStartElement: (NSString*)elementName
   return num;  
 }
 
+- (id) decodeShadowOffsetHoriz: (GSXibElement *)element
+{
+  NSSize size = [self decodeSizeForKey: @"offset"];
+  return [NSNumber numberWithFloat: size.width];
+}
+
+- (id) decodeShadowOffsetVert: (GSXibElement *)element
+{
+  NSSize size = [self decodeSizeForKey: @"offset"];
+  return [NSNumber numberWithFloat: size.height];
+}
+
 - (id) _decodePlacementForObject: (id)obj
 {
   NSGridRowAlignment alignment = NSGridCellPlacementNone;
@@ -3169,6 +3189,31 @@ didStartElement: (NSString*)elementName
     }
 }
 
+- (void) addToolTip: (GSXibElement *)element forObject: (id)object
+{
+  NSString *toolTipString = [element attributeForKey: @"toolTip"];
+  
+  // Process tooltips...
+  if (toolTipString == nil)
+    {
+      GSXibElement *toolTipElement = [element elementForKey: @"toolTip"];
+
+      toolTipString = [toolTipElement value];
+    }
+
+  if (toolTipString != nil)
+    {
+      if ([object respondsToSelector: @selector(setToolTip:)])
+        {
+          [object setToolTip: toolTipString];
+        }
+      else if ([object respondsToSelector: @selector(setHeaderToolTip:)])
+        {
+          [object setHeaderToolTip: toolTipString];
+        }
+    }
+}
+
 - (id) decodeObjectForXib: (GSXibElement*)element
              forClassName: (NSString*)classname
                    withID: (NSString*)objID
@@ -3177,15 +3222,8 @@ didStartElement: (NSString*)elementName
   id object = [super decodeObjectForXib: element forClassName: classname withID: objID];
 
   [self addOrderedObject: element];
-
-  // Process tooltips...
-  if ([element attributeForKey: @"toolTip"])
-    {
-      if ([object respondsToSelector: @selector(setToolTip:)])
-        [object setToolTip: [element attributeForKey: @"toolTip"]];
-      else if ([object respondsToSelector: @selector(setHeaderToolTip:)])
-        [object setHeaderToolTip: [element attributeForKey: @"toolTip"]];
-    }
+  [self addToolTip: element forObject: object];
+  
   // Process IB runtime attributes for element...
   // Ensure we don't process the placeholders...
   if ([element elementForKey: @"userDefinedRuntimeAttributes"] &&

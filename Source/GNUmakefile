@@ -683,20 +683,7 @@ GSWindowDecorationView.h \
 GSXibElement.h \
 GSXibLoading.h \
 GSXibKeyedUnarchiver.h \
-GSHelpAttachment.h \
-GSAutoLayoutVFLParser.h \
-GSAutoLayoutEngine.h \
-GSCassowarySolver.h \
-GSCSConstraint.h \
-GSCSVariable.h \
-GSCSFloatComparator.h \
-GSCSSolution.h \
-GSCSLinearExpression.h \
-GSCSConstraintOperator.h \
-GSCSStrength.h \
-GSCSEditVariableManager.h \
-GSCSEditInfo.h \
-GSCSTableau.h
+GSHelpAttachment.h
 
 libgnustep-gui_HEADER_FILES = ${GUI_HEADERS}
 
@@ -713,6 +700,9 @@ libgui-resources_RESOURCE_FILES = Info-gnustep.plist
 
 # Extra DLL exports file
 libgnustep-gui_DLL_DEF = libgnustep-gui.def
+
+# pkg-config file
+libgnustep-gui_PKGCONFIG_FILES = "gnustep-gui.pc"
 
 include GNUmakefile.preamble
 
