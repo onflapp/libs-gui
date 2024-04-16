@@ -68,9 +68,11 @@
 #import "AppKit/NSPrintInfo.h"
 #import "AppKit/NSPrintOperation.h"
 #import "AppKit/NSScrollView.h"
+#import "AppKit/NSShadow.h"
 #import "AppKit/NSView.h"
 #import "AppKit/NSWindow.h"
 #import "AppKit/NSWorkspace.h"
+#import "AppKit/NSAppearance.h"
 #import "AppKit/PSOperators.h"
 #import "GNUstepGUI/GSDisplayServer.h"
 #import "GNUstepGUI/GSTrackingRect.h"
@@ -569,7 +571,7 @@ GSSetDragTypes(NSView* obj, NSArray *types)
       viewClass = [NSView class];
       rectClass = [GSTrackingRect class];
       NSDebugLLog(@"NSView", @"Initialize NSView class\n");
-      [self setVersion: 1];
+      [self setVersion: 2];
 
       // expose bindings
       [self exposeBinding: NSToolTipBinding];
@@ -771,6 +773,8 @@ GSSetDragTypes(NSView* obj, NSArray *types)
     }
   TEST_RELEASE(_cursor_rects);
   TEST_RELEASE(_tracking_rects);
+  TEST_RELEASE(_shadow);
+  
   [self unregisterDraggedTypes];
   [self releaseGState];
 
@@ -4608,6 +4612,12 @@ static NSView* findByTag(NSView *view, NSInteger aTag, NSUInteger *level)
         {
           [aCoder encodeConditionalObject: _super_view forKey: @"NSSuperview"];
         }
+
+      // Encode the shadow...
+      if (_shadow != nil)
+	{
+	  [aCoder encodeConditionalObject: _shadow forKey: @"NSViewShadow"];
+	}
     }
   else
     {
@@ -4625,6 +4635,9 @@ static NSView* findByTag(NSView *view, NSInteger aTag, NSUInteger *level)
       [aCoder encodeConditionalObject: [self nextKeyView]];
       [aCoder encodeConditionalObject: [self previousKeyView]];
       [aCoder encodeObject: _sub_views];
+
+      // Encode view effects attributes...
+      [aCoder encodeConditionalObject: [self shadow]];
       NSDebugLLog(@"NSView", @"NSView: finish encoding\n");
     }
 }
@@ -4737,12 +4750,19 @@ static NSView* findByTag(NSView *view, NSInteger aTag, NSUInteger *level)
 	  [self didAddSubview: sub];
 	}
 
+      // Decode the shadow...
+      if ([aDecoder containsValueForKey: @"NSViewShadow"])
+	{
+	  [self setShadow: [aDecoder decodeObjectForKey: @"NSViewShadow"]];
+	}
+
       // the superview...
       //[aDecoder decodeObjectForKey: @"NSSuperview"];
     }
   else
     {
       NSRect	rect;
+      int version = [aDecoder versionForClassName: @"NSView"];
       
       NSDebugLLog(@"NSView", @"NSView: start decoding\n");
 
@@ -4798,6 +4818,12 @@ static NSView* findByTag(NSView *view, NSInteger aTag, NSUInteger *level)
 	  [self didAddSubview: sub];
 	}
       RELEASE(subs);
+
+      // Decode the shadow if this is version 2 or greater...
+      if (version >= 2)
+	{
+	  [self setShadow: [aDecoder decodeObject]];
+	}
     }
 
   return self;
@@ -5231,6 +5257,30 @@ static NSView* findByTag(NSView *view, NSInteger aTag, NSUInteger *level)
   return 0;
 }
 
+/* Implement NSAppearanceCustomization */
+- (NSAppearance*) appearance {
+  return _appearance;
+}
+
+- (void) setAppearance: (NSAppearance*) appearance {
+  ASSIGNCOPY(_appearance, appearance);
+}
+
+- (NSAppearance*) effectiveAppearance {
+  if (_appearance)
+  {
+    return _appearance;
+  }
+  else if ([self superview])
+  {
+    return [[self superview] effectiveAppearance];
+  }
+  else
+  {
+    return [NSAppearance currentAppearance];
+  }
+}
+
 @end
 
 #if OS_API_VERSION(MAC_OS_X_VERSION_10_7, GS_API_LATEST)
@@ -5481,6 +5531,20 @@ cmpFrame(id view1, id view2, void *context)
       nextKeyView = aView;
     }
   [self setNextKeyView: nextKeyView];
+}
+
+@end
+
+@implementation NSView (CoreAnimationSupport)
+
+- (NSShadow *) shadow
+{
+  return _shadow;
+}
+
+- (void) setShadow: (NSShadow *)shadow
+{
+  ASSIGN(_shadow, shadow);
 }
 
 @end

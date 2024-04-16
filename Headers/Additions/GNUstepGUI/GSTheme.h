@@ -1266,6 +1266,12 @@ APPKIT_EXPORT_CLASS
 			   tabViewType: (NSTabViewType)type
 			       tabView: (NSTabView *)view;
 
+- (NSImage *) imageForTabPart: (GSTabPart)part
+			 type: (NSTabViewType)type;
+
+- (NSRect) tabViewBackgroundRectForBounds: (NSRect)aRect
+			      tabViewType: (NSTabViewType)type;
+
 - (void) drawTabViewRect: (NSRect)rect
 		  inView: (NSView *)view
 	       withItems: (NSArray *)items
@@ -1332,6 +1338,8 @@ APPKIT_EXPORT_CLASS
 - (void) drawTableViewRow: (NSInteger)rowIndex 
 		 clipRect: (NSRect)clipRect
 		   inView: (NSView *)view;
+
+- (BOOL) isBoxOpaque: (NSBox *)box;
 
 - (void) drawBoxInClipRect: (NSRect)clipRect
 		   boxType: (NSBoxType)boxType

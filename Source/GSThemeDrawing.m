@@ -33,6 +33,7 @@
 
 #import "AppKit/NSAttributedString.h"
 #import "AppKit/NSBezierPath.h"
+#import "AppKit/NSButton.h"
 #import "AppKit/NSButtonCell.h"
 #import "AppKit/NSBrowser.h"
 #import "AppKit/NSBrowserCell.h"
@@ -3309,18 +3310,10 @@ static NSDictionary *titleTextAttributes[3] = {nil, nil, nil};
 
     if (selectionColor == nil)
       {
-	// Switch to the alternate color of the backgroundColor is white.
-	if([backgroundColor isEqual: [NSColor whiteColor]])
-	  {
-	    selectionColor = [NSColor colorWithCalibratedRed: 0.86
-						       green: 0.92
-							blue: 0.99
-						       alpha: 1.0];
-	  }
-	else
-	  {
-	    selectionColor = [NSColor whiteColor];
-	  }
+	selectionColor = [NSColor colorWithCalibratedRed: 0.86
+						   green: 0.92
+						    blue: 0.99
+						   alpha: 1.0];
       }
     [selectionColor set];
   }
@@ -3479,6 +3472,18 @@ static NSDictionary *titleTextAttributes[3] = {nil, nil, nil};
 
       if (i == editedColumn && rowIndex == editedRow)
 	[cell _setInEditing: NO];
+    }
+}
+
+- (BOOL) isBoxOpaque: (NSBox *)box
+{
+  if ([box boxType] == NSBoxCustom)
+    {
+      return ![box isTransparent];
+    }
+  else
+    {
+      return YES;
     }
 }
 
