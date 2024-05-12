@@ -724,6 +724,17 @@ static NSString         *disabledName = @".GNUstepDisabled";
   NSResponder   *resp = [[_application keyWindow] firstResponder];
   id            obj = nil;
 
+  /*
+   *    allow to reqest service even if we have no window
+   *    e.g. Preview.app requesting screenshot
+   */
+  if (resp == nil)
+    {
+      if ([[_application delegate] respondsToSelector:
+                  @selector(validRequestorForSendType:returnType:)])
+        resp = [_application delegate];
+    }
+
   for (i = 0; i <= es; i++)
     {
       NSString  *sendType;
@@ -1366,6 +1377,17 @@ static NSString         *disabledName = @".GNUstepDisabled";
   unsigned      es = [sendTypes count];
   unsigned      er = [returnTypes count];
   NSResponder	*resp = [[_application keyWindow] firstResponder];
+
+  /*
+   *    allow to reqest service even if we have no window
+   *    e.g. Preview.app requesting screenshot
+   */
+  if (resp == nil)
+    {
+      if ([[_application delegate] respondsToSelector:
+                  @selector(validRequestorForSendType:returnType:)])
+        resp = [_application delegate];
+    }
 
   /*
    *    If the menu item is not in our map, it must be the item containing

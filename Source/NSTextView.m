@@ -625,16 +625,20 @@ static BOOL did_register_for_services;
 
 +(void) registerForServices
 {
-  NSArray *types;
+  NSArray *returnTypes;
+  NSArray *sendTypes;
 
   did_register_for_services = YES;
 
-  types = [NSArray arrayWithObjects: NSStringPboardType,
-		    NSRTFPboardType, NSRTFDPboardType, nil];
+  sendTypes = [NSArray arrayWithObjects: NSStringPboardType,
+                        NSRTFPboardType, NSRTFDPboardType, nil];
+
+  returnTypes = [NSArray arrayWithObjects: NSStringPboardType,
+                          NSRTFPboardType, NSRTFDPboardType, NSTIFFPboardType, nil];
 
   NSAssert(NSApp, @"Called before the shared application object was created.");
-  [NSApp registerServicesMenuSendTypes: types
-			   returnTypes: types];
+  [NSApp registerServicesMenuSendTypes: sendTypes
+			   returnTypes: returnTypes];
 }
 
 +(NSDictionary *) defaultTypingAttributes
@@ -3410,6 +3414,10 @@ This method is for user changes; see NSTextView_actions.m.
       returnOK = YES;
     }
   else if (_tf.is_editable && [returnType isEqual: NSStringPboardType])
+    {
+      returnOK = YES;
+    }
+  else if (_tf.imports_graphics && _tf.is_editable && [returnType isEqual: NSTIFFPboardType])
     {
       returnOK = YES;
     }
