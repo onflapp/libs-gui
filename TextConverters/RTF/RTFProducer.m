@@ -150,6 +150,8 @@
   ASSIGN(bgColor, [NSColor textBackgroundColor]);
   ASSIGN(ulColor, [NSColor textColor]);
 
+  unnamedAttachmentCounter = (int)[NSDate timeIntervalSinceReferenceDate];
+
   return self;
 }
 
@@ -1050,7 +1052,7 @@
 
 			  attachmentFilename =
 			    [NSString stringWithFormat:
-					@"__unnamed_file_%d.tiff",
+					@"__unnamed_file_%x.tiff",
 					unnamedAttachmentCounter++];
 			  [attachmentFileWrapper
 			    setPreferredFilename: attachmentFilename];
