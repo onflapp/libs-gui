@@ -59,6 +59,7 @@
 BOOL NSImageForceCaching = NO; /* use on missmatch */
 
 static NSDictionary		*nsmapping = nil;
+static NSInteger                 _global_repsCacheCount = 0;
 
 // OS_API_VERSION(MAC_OS_X_VERSION_10_5, GS_API_LATEST)
 NSString *const NSImageNameQuickLookTemplate        = @"NSQuickLookTemplate";
@@ -97,6 +98,7 @@ NSString *const NSImageNameNetwork                  = @"NSNetwork";
 
 @interface NSView (Private)
 - (void) _lockFocusInContext: (NSGraphicsContext *)ctxt inRect: (NSRect)rect;
+- (void) _validateCache;
 @end
 
 @implementation NSBundle (NSImageAdditions)
@@ -458,6 +460,12 @@ repd_for_rep(NSArray *_reps, NSImageRep *rep)
 	       name: NSImageRepRegistryChangedNotification
 	     object: [NSImageRep class]];
 
+      [[NSNotificationCenter defaultCenter]
+        addObserver:self
+           selector:@selector(_clearRepCaches:)
+               name:NSApplicationDidChangeScreenParametersNotification
+             object:nil];
+
       [imageLock unlock];
     }
 }
@@ -536,12 +544,6 @@ repd_for_rep(NSArray *_reps, NSImageRep *rep)
   _reps = [[NSMutableArray alloc] initWithCapacity: 2];
   ASSIGN(_color, clearColor);
   _cacheMode = NSImageCacheDefault;
-
-  [[NSNotificationCenter defaultCenter]
-    addObserver:self
-       selector:@selector(_clearRepCaches:)
-           name:NSApplicationDidChangeScreenParametersNotification
-         object:nil];
 
   return self;
 }
@@ -921,6 +923,8 @@ repd_for_rep(NSArray *_reps, NSImageRep *rep)
       _flags.syncLoad = NO;
     }
 
+  [self _validateCache];
+
   /* Go through all our representations and determine if at least one
      is a valid cache */
   // FIXME: Not sure if this is correct
@@ -939,8 +943,11 @@ repd_for_rep(NSArray *_reps, NSImageRep *rep)
   return valid;
 }
 
-- (void) recache
+- (void) _validateCache
 {
+  if (_global_repsCacheCount == _repsCacheCount)
+    return;
+
   NSUInteger i;
 
   i = [_reps count];
@@ -954,6 +961,7 @@ repd_for_rep(NSArray *_reps, NSImageRep *rep)
           [_reps removeObjectAtIndex: i];
         }
     }
+  _repsCacheCount = _global_repsCacheCount;
 }
 
 - (void) setScalesWhenResized: (BOOL)flag
@@ -1230,6 +1238,8 @@ repd_for_rep(NSArray *_reps, NSImageRep *rep)
   NSUInteger i, count;
   GSRepData *repd;
 
+  [self _validateCache];
+
   count = [imageRepArray count];
   for (i = 0; i < count; i++)
     {
@@ -1244,6 +1254,8 @@ repd_for_rep(NSArray *_reps, NSImageRep *rep)
 {
   NSUInteger i;
   GSRepData *repd;
+
+  [self _validateCache];
 
   i = [_reps count];
   while (i-- > 0)
@@ -1363,6 +1375,8 @@ repd_for_rep(NSArray *_reps, NSImageRep *rep)
   NSMutableArray *breps = [NSMutableArray array];
   NSString *deviceColorSpace = [deviceDescription objectForKey: NSDeviceColorSpaceName];
 
+  [self _validateCache];
+
   if (deviceColorSpace != nil)
     {
       NSUInteger deviceColors = NSNumberOfColorComponents(deviceColorSpace);
@@ -1446,6 +1460,8 @@ static NSSize GSResolutionOfImageRep(NSImageRep *rep)
           withResolutionMatch: (NSDictionary*)deviceDescription
 {
   NSMutableArray *breps = [NSMutableArray array];
+
+  [self _validateCache];
 
   NSValue *resolution = [deviceDescription objectForKey: NSDeviceResolution];
 
@@ -1589,6 +1605,8 @@ static NSSize GSResolutionOfImageRep(NSImageRep *rep)
   NSMutableArray *breps = [NSMutableArray array];
   NSNumber *bpsValue = [deviceDescription objectForKey: NSDeviceBitsPerSample];
 
+  [self _validateCache];
+
   if (bpsValue != nil)
     {
       NSInteger deviceBps = [bpsValue integerValue];
@@ -1639,6 +1657,8 @@ static NSSize GSResolutionOfImageRep(NSImageRep *rep)
 {
   NSUInteger count;
 
+  [self _validateCache];
+
   if (_flags.syncLoad)
     {
       /* Make sure any images that were added with _useFromFile: are loaded
@@ -1675,6 +1695,8 @@ static NSSize GSResolutionOfImageRep(NSImageRep *rep)
 {
   NSMutableArray *reps = [self _representationsWithCachedImages: NO];
   
+  [self _validateCache];
+
   if (deviceDescription == nil)
     {
       if ([GSCurrentContext() isDrawingToScreen] == YES)
@@ -2232,6 +2254,12 @@ iterate_reps_for_types(NSArray* imageReps, SEL method)
   DESTROY(imagePasteboardTypes);
 }
 
++ (void) _clearRepCaches: (NSNotification*)notif
+{
+  NSDebugLLog(@"NSImage", @"Screen size has changed");
+  _global_repsCacheCount++;
+}
+
 /**
  * For all NSImage instances cached in nameDict, recompute the
  * path using +_pathForImageNamed: and if it has changed,
@@ -2289,11 +2317,6 @@ iterate_reps_for_types(NSArray* imageReps, SEL method)
   return name;
 }
 
-- (void) _clearRepCaches: (NSNotification*)notif
-{
-  NSDebugLLog(@"NSImage", @"Screen size has changed");
-  [self recache];
-}
 - (BOOL) _loadFromData: (NSData *)data
 {
   BOOL ok;
@@ -2404,6 +2427,7 @@ iterate_reps_for_types(NSArray* imageReps, SEL method)
 
 - (GSRepData*) _cacheForRep: (NSImageRep*)rep
 {
+  [self _validateCache];
   if ([rep isKindOfClass: cachedClass] == YES)
     {
       return repd_for_rep(_reps, rep);

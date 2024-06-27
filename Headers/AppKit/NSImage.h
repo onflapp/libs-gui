@@ -144,6 +144,7 @@ APPKIT_EXPORT_CLASS
     unsigned	syncLoad: 1;
   } _flags;
   NSMutableArray	*_reps;
+  NSInteger             _repsCacheCount;
   NSColor		*_color;
   NSView                *_lockedView;
   id		        _delegate;
