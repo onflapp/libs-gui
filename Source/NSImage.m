@@ -907,7 +907,6 @@ repd_for_rep(NSArray *_reps, NSImageRep *rep)
   return _cacheMode;
 }
 
-
 // Determining How the Image is Drawn 
 - (BOOL) isValid
 {
@@ -941,6 +940,23 @@ repd_for_rep(NSArray *_reps, NSImageRep *rep)
     }
 
   return valid;
+}
+
+- (void) recache
+{
+  NSUInteger i;
+
+  i = [_reps count];
+  while (i--) 
+    {
+      GSRepData *repd;
+
+      repd = (GSRepData*)[_reps objectAtIndex: i];
+      if (repd->original != nil)
+        {
+          [_reps removeObjectAtIndex: i];
+        }
+    }
 }
 
 - (void) _validateCache
