@@ -1,3 +1,31 @@
+2025-02-11 Richard Frith-Macdonald <rfm@gnu.org>
+
+	* ANNOUNCE:
+	* BUGS:
+	* INSTALL:
+	* NEWS:
+	* Source/DocMakefile:
+	* Version:
+	Updates for 0.32.0 release
+
+2024-11-08 Gregory John Casamento <greg.casamento@gmail.com>
+
+	* Headers/AppKit/NSBrowser.h: Add dictionary to hold relationships.
+	* Source/NSBrowser.m: Add logic in methods to support bindings,
+	expose bindings in +initialize.
+	* Source/NSTextFieldCell.m: Minor fix to NSTextField for displaying
+	binding values.
+
+2024-10-31 Richard Frith-Macdonald <rfm@gnu.org>
+
+	* Source/GSServicesManager.m: fix -laterDate: conditionals to be true
+	only when file date has been updated (returned value != receiver).
+
+2024-10-29 Fred Kiefer <FredKiefer@gmx.de>
+
+	* Headers/AppKit/NSLayoutAnchor.h: Add missing include that is required after a change in base.
+	* Source/NSTableView.m: Forward declare new methods.
+
 2024-08-29 Gregory John Casamento <greg.casamento@gmail.com>
 
 	* Source/NSBundleAdditions.m: Quick fix for .gorm loading
