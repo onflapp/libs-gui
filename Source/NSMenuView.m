@@ -698,6 +698,9 @@ static float menuBarHeight = 0.0;
 
   // Ask the menu to update itself. This will call sizeToFit if needed.
   [_attachedMenu update];
+
+  if ([_attachedMenu isPartlyOffScreen])
+    [_attachedMenu moveOnScreen];
 }
 
 - (void) setNeedsSizing: (BOOL)flag

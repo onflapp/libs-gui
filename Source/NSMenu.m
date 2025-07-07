@@ -2077,6 +2077,83 @@ static BOOL menuBarVisible = YES;
 
 #define SHIFT_DELTA 18.0
 
+- (void) moveOnScreen
+{
+  NSWindow *theWindow = [self window];
+  NSRect    frameRect = [theWindow frame];
+  NSRect    screenRect = [[theWindow screen] visibleFrame];
+  NSPoint   vector    = {0.0, 0.0};
+  BOOL      moveItX   = NO;
+  BOOL      moveItY   = NO;
+  NSPoint location = [theWindow mouseLocationOutsideOfEventStream];
+  NSPoint pointerLoc = [theWindow convertBaseToScreen: location];
+  NSInterfaceStyle style = NSInterfaceStyleForKey(@"NSMenuInterfaceStyle", nil);
+
+  if (pointerLoc.x + frameRect.size.width > screenRect.size.width)
+    moveItX = YES;
+
+  if (pointerLoc.y < frameRect.size.height)
+    moveItY = YES;
+
+  if (!moveItX && !moveItY)
+    return;
+
+  // Don't move the main menu bar in Macintosh interface style, this is
+  // annoying (in particular, since the effective screen range is reduced
+  // by the height of the menu bar!)
+  if (style == NSMacintoshInterfaceStyle && [self _isMain])
+    return;
+
+  NSPoint  masterLocation;
+  NSSize   masterSize;
+  NSPoint  destinationPoint;
+      
+  if (style == NSMacintoshInterfaceStyle || _menu.horizontal)
+    {
+      masterLocation = frameRect.origin;
+      destinationPoint.x = masterLocation.x + vector.x;
+      destinationPoint.y = masterLocation.y + vector.y;
+      [self nestedSetFrameOrigin: destinationPoint];
+    }
+  else
+    {
+      NSMenu  *masterMenu;
+     
+      masterMenu = self->_superMenu;
+       
+      if (!masterMenu)
+        {
+          masterLocation = [[self window] frame].origin;
+          masterSize = [[self window] frame].size;
+	  destinationPoint = masterLocation;
+
+	  if (moveItX)
+            destinationPoint.x = screenRect.size.width - masterSize.width;
+	  if (moveItY)
+            destinationPoint.y = 0;
+	}
+      else
+        {
+          masterLocation = [[masterMenu window] frame].origin;
+          masterSize = [[masterMenu window] frame].size;
+	  destinationPoint = masterLocation;
+
+          if (moveItX)
+            destinationPoint.x = masterLocation.x - frameRect.size.width;
+	  else
+            destinationPoint.x = [[self window] frame].origin.x;
+
+          if (moveItX)
+            destinationPoint.y = masterLocation.y + masterSize.height - frameRect.size.height;
+	  if (moveItY)
+            destinationPoint.y = 0;
+        }
+
+      [self nestedSetFrameOrigin: destinationPoint];
+    }
+}
+
+
 - (void) shiftOnScreen
 {
   NSWindow *theWindow = [self window];
@@ -2087,7 +2164,7 @@ static BOOL menuBarVisible = YES;
   NSPoint location = [theWindow mouseLocationOutsideOfEventStream];
   NSPoint pointerLoc = [theWindow convertBaseToScreen: location];
   NSInterfaceStyle style = NSInterfaceStyleForKey(@"NSMenuInterfaceStyle", nil);
-  
+
   // Don't move the main menu bar in Macintosh interface style, this is
   // annoying (in particular, since the effective screen range is reduced
   // by the height of the menu bar!)
