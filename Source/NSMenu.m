@@ -1719,6 +1719,8 @@ static BOOL menuBarVisible = YES;
 
   if ([NSApp mainMenu] == self)
     {
+      [self _moveToMainScreen];
+
       [nc addObserver: self
              selector: @selector(windowDidChangeScreen:)
                  name: NSWindowDidBecomeKeyNotification
@@ -1738,6 +1740,32 @@ static BOOL menuBarVisible = YES;
     // we must make sure that any attached submenu is visible too.
     [[self attachedMenu] display];
   }
+}
+
+- (void) _moveToMainScreen
+{
+  NSScreen *main = [[NSScreen screens] firstObject];
+  if ([_aWindow screen] == main)
+    return;
+
+  NSRect   frame;
+  NSRect   oldScreenFrame;
+  NSRect   newScreenFrame;
+  CGFloat  yOffset;
+
+  oldScreenFrame = [[_aWindow screen] frame];
+  newScreenFrame = [main frame];
+  frame = [_aWindow frame];
+  
+  // Keep left offset fixed
+  frame.origin.x += newScreenFrame.origin.x - oldScreenFrame.origin.x;
+
+  // Keep top offset fixed
+  yOffset = NSMaxY(oldScreenFrame) - NSMaxY(frame);
+  frame.origin.y = NSMaxY(newScreenFrame) - yOffset - frame.size.height;
+  
+  // setFrame: changes _screen value.
+  [self nestedSetFrameOrigin: frame.origin];
 }
 
 - (void) windowDidChangeScreen: (NSNotification*)notification
